@@ -8,7 +8,7 @@ const {
 const { validateSignup } = require("../middleware/validateMiddleware");
 const router = express.Router();
 
-router.post("/signup", validateSignup, signup);
+router.post("/signup", signup);
 router.post("/login", login);
 router.post("/token/refresh", refreshToken);
 
