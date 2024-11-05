@@ -32,7 +32,7 @@ exports.signup = async (req, res) => {
         pass: process.env.NODEMAILER_PASSWORD,
       },
     });
-
+    console.log(email, password);
     const mailOptions = {
       from: process.env.NODEMAILER_EMAIL,
       to: email,
