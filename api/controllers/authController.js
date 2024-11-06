@@ -38,7 +38,7 @@ exports.signup = async (req, res) => {
       from: process.env.NODEMAILER_EMAIL,
       to: email,
       subject: "[Connect] Verify your Connect account",
-      text: `Enter OTP: <b>${otp}</b> to gain access, \nWelcome to Connect, we're so excited to create you a second brain for your connections`,
+      text: `<p>Enter OTP: <b>${otp}</b> to gain access, \nWelcome to Connect, we're so excited to create you a second brain for your connections</p>`,
     };
     try {
       await transporter.sendMail(mailOptions);
@@ -64,7 +64,7 @@ exports.resendOTP = async (req, res) => {
     from: process.env.NODEMAILER_EMAIL,
     to: email,
     subject: "[Connect] Verify your Connect account",
-    text: `(Resend mail) Enter OTP: <b>${otpStorage[otp]}</b> to gain access, \nWelcome to Connect, we're so excited to create you a second brain for your connections`,
+    text: `<p>(Resend mail) Enter OTP: <b>${otpStorage[otp]}</b> to gain access, \nWelcome to Connect, we're so excited to create you a second brain for your connections</p>`,
   };
   try {
     await transporter.sendMail(mailOptions);
@@ -78,6 +78,8 @@ exports.resendOTP = async (req, res) => {
 exports.verifyOTP = async (req, res) => {
   const { otp } = req.body;
   try {
+    console.log("SentOTP: ", otpStorage[otp]);
+    console.log("EnteredOTP: ", otp);
     if (otpStorage[email] === email && otpStorage[otp] == otp) {
       const newUser = new User({
         email,
