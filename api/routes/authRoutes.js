@@ -5,12 +5,14 @@ const {
   login,
   refreshToken,
   verifyOTP,
+  resendOTP,
 } = require("../controllers/authController");
 const { validateSignup } = require("../middleware/validateMiddleware");
 const router = express.Router();
 
 router.post("/signup", signup);
 router.post("/verifyotp", verifyOTP);
+router.get("/resendotp", resendOTP);
 router.post("/login", login);
 router.post("/token/refresh", refreshToken);
 

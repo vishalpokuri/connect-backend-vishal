@@ -16,6 +16,7 @@ exports.signup = async (req, res) => {
   const { email, password } = req.body;
   otpStorage[email] = email;
   otpStorage[password] = password;
+
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -32,12 +33,11 @@ exports.signup = async (req, res) => {
         pass: process.env.NODEMAILER_PASSWORD,
       },
     });
-    console.log(email, password);
     const mailOptions = {
       from: process.env.NODEMAILER_EMAIL,
       to: email,
       subject: "[Connect] Verify your Connect account",
-      text: `Enter OTP: ${otp} to gain access, \n Welcome to Connect, we're so excited to create you a second brain for your connections`,
+      text: `Enter OTP: <b>${otp}</b> to gain access, \nWelcome to Connect, we're so excited to create you a second brain for your connections`,
     };
     try {
       await transporter.sendMail(mailOptions);
@@ -51,9 +51,31 @@ exports.signup = async (req, res) => {
     throw error;
   }
 };
+exports.resendOTP = async (req, res) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.NODEMAILER_EMAIL,
+      pass: process.env.NODEMAILER_PASSWORD,
+    },
+  });
+  const mailOptions = {
+    from: process.env.NODEMAILER_EMAIL,
+    to: email,
+    subject: "[Connect] Verify your Connect account",
+    text: `(Resend mail) Enter OTP: <b>${otpStorage[otp]}</b> to gain access, \nWelcome to Connect, we're so excited to create you a second brain for your connections`,
+  };
+  try {
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: "Resent OTP to your email" });
+  } catch (e) {
+    console.error(e);
+    res.status(400).json({ message: "Unable to resend OTP" });
+  }
+};
 
 exports.verifyOTP = async (req, res) => {
-  const { email, otp } = req.body;
+  const { otp } = req.body;
   try {
     if (otpStorage[email] === email && otpStorage[otp] === otp) {
       const newUser = new User({
