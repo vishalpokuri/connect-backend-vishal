@@ -45,20 +45,6 @@ exports.signup = async (req, res) => {
       console.log("Error sending mail", e);
     }
     res.status(200).json({ message: "OTP sent to your email" });
-    // const newUser = new User({
-    //   email,
-    //   password: hashPassword(password),
-    // });
-    // await newUser.save();
-
-    // const accessToken = generateAccessToken(newUser._id, newUser.username);
-    // const refreshToken = generateRefreshToken(newUser._id, newUser.username);
-
-    // res.status(201).json({
-    //   message: "User registered successfully",
-    //   accessToken,
-    //   refreshToken,
-    // });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -68,8 +54,23 @@ exports.signup = async (req, res) => {
 
 exports.verifyOTP = async (req, res) => {
   const { email, otp } = req.body;
-  if (otpStorage[email] === email && otpStorage[otp] === otp) {
-    console.log("Verified successfully");
+  try {
+    if (otpStorage[email] === email && otpStorage[otp] === otp) {
+      const newUser = new User({
+        email,
+        password: hashPassword(password),
+      });
+      await newUser.save();
+      const accessToken = generateAccessToken(newUser._id, newUser.username);
+      const refreshToken = generateRefreshToken(newUser._id, newUser.username);
+      res.status(201).json({
+        message: "User registered successfully",
+        accessToken,
+        refreshToken,
+      });
+    }
+  } catch (e) {
+    return res.status(400).json({ message: "Invalid otp" });
   }
 };
 
