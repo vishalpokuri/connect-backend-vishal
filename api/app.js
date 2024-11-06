@@ -9,7 +9,7 @@ const verifyToken = require("./middleware/authMiddleware");
 const authRoutes = require("./routes/authRoutes");
 const socialMediaRoutes = require("./routes/socialMediaRoutes");
 const userPhotoRoutes = require("./routes/userPhotoRoutes");
-
+const userDataRoutes = require("./routes/userDataRoutes");
 const app = express();
 
 connectDB();
@@ -25,6 +25,7 @@ app.use(bodyParser.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/sociallinks", socialMediaRoutes);
 app.use("/api/userphoto", userPhotoRoutes);
+app.use("/api/userData", userDataRoutes);
 
 app.get("/api/protected", verifyToken, (req, res) => {
   res.json({

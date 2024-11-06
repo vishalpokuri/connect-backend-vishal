@@ -13,19 +13,17 @@ const {
 let otpStorage = {};
 
 exports.signup = async (req, res) => {
-  console.log(req);
   const { email, password } = req.body;
-  otpStorage[email] = email;
-  otpStorage[password] = password;
-
+  otpStorage["email"] = email;
+  otpStorage["password"] = password;
+  const otp = crypto.randomInt(100000, 999999).toString();
+  otpStorage["otp"] = otp;
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
     //Generate OTP
-    const otp = crypto.randomInt(100000, 999999).toString();
-    otpStorage[otp] = otp;
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -62,9 +60,9 @@ exports.resendOTP = async (req, res) => {
   });
   const mailOptions = {
     from: process.env.NODEMAILER_EMAIL,
-    to: email,
+    to: otpStorage["email"],
     subject: "[Connect] Verify your Connect account",
-    text: `<p>(Resend mail) Enter OTP: <b>${otpStorage[otp]}</b> to gain access, \nWelcome to Connect, we're so excited to create you a second brain for your connections</p>`,
+    text: `<p>(Resend mail) Enter OTP: <b>${otpStorage["otp"]}</b> to gain access, \nWelcome to Connect, we're so excited to create you a second brain for your connections</p>`,
   };
   try {
     await transporter.sendMail(mailOptions);
@@ -78,12 +76,11 @@ exports.resendOTP = async (req, res) => {
 exports.verifyOTP = async (req, res) => {
   const { otp } = req.body;
   try {
-    console.log("SentOTP: ", otpStorage[otp]);
-    console.log("EnteredOTP: ", otp);
-    if (otpStorage[email] === email && otpStorage[otp] == otp) {
+    if (otpStorage["otp"] == otp) {
       const newUser = new User({
-        email,
-        password: hashPassword(password),
+        email: otpStorage["email"],
+        password: hashPassword(otpStorage["password"]),
+        onboardingLevel: 1,
       });
       await newUser.save();
       const accessToken = generateAccessToken(newUser._id, newUser.username);
@@ -96,6 +93,7 @@ exports.verifyOTP = async (req, res) => {
     }
     // otpStorage = {};
   } catch (e) {
+    console.error(e);
     return res.status(400).json({ message: "Invalid otp" });
   }
 };
