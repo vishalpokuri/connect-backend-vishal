@@ -10,9 +10,10 @@ const {
 const { validateSignup } = require("../middleware/validateMiddleware");
 const router = express.Router();
 
+router.get("/resendotp", resendOTP);
+
 router.post("/signup", signup);
 router.post("/verifyotp", verifyOTP);
-router.get("/resendotp", resendOTP);
 router.post("/login", login);
 router.post("/token/refresh", refreshToken);
 

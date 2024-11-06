@@ -13,6 +13,7 @@ const {
 let otpStorage = {};
 
 exports.signup = async (req, res) => {
+  console.log(req);
   const { email, password } = req.body;
   otpStorage[email] = email;
   otpStorage[password] = password;
@@ -77,7 +78,7 @@ exports.resendOTP = async (req, res) => {
 exports.verifyOTP = async (req, res) => {
   const { otp } = req.body;
   try {
-    if (otpStorage[email] === email && otpStorage[otp] === otp) {
+    if (otpStorage[email] === email && otpStorage[otp] == otp) {
       const newUser = new User({
         email,
         password: hashPassword(password),
@@ -91,6 +92,7 @@ exports.verifyOTP = async (req, res) => {
         refreshToken,
       });
     }
+    // otpStorage = {};
   } catch (e) {
     return res.status(400).json({ message: "Invalid otp" });
   }
